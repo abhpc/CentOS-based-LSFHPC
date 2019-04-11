@@ -6,11 +6,11 @@
 # 指定计算核数
 #BSUB -n 24
 
-# 指定计算类型:2d, 3d, 2ddp, 或者3ddp。
-TYPE="3d"
-
 # 指定队列，队列名字通过命令bqueues获得
 #BSUB -q E5-2678v3
+
+# 指定计算类型:2d, 3d, 2ddp, 或者3ddp。
+TYPE="3d"
 
 # 指定Fluent的求解脚本，参考写成
 FLT_SCR="steady.flt"
