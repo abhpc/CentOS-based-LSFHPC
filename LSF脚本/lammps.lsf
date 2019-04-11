@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# 这里指定作业名，此脚本默认输入文件为$LSB_JOBNAME.in
+#BSUB -J test
+
+# 指定计算核数
+#BSUB -n 24
+
+# 指定队列，队列名字通过命令bqueues获得
+#BSUB -q E5-2678v3
+
+# 指定LAMMPS版本，如果有多个版本同时存在的话。
+LMP_VERSION="12Dec18"
+
+# 加速类型，一般有omp和gpu两种，对CPU而言，默认选择omp。
+ACC_TYPE="omp"
+PK_CORES=1
+
+#====================   如果以下内容不懂的话，不要轻易修改    =====================================================================
+#===============================================================================================================================
+#BSUB -o %J.out
+#BSUB -e %J.err
+
+export OMP_NUM_THREADS=1
+
+CURDIR=$PWD
+rm -rf $CURDIR/nodelist.$LSB_JOBID >& /dev/null 
+for i in `echo $LSB_HOSTS`
+do 
+	echo $i >> $CURDIR/nodelist.$LSB_JOBID
+done
+
+uniq $CURDIR/nodelist.$LSB_JOBID > $CURDIR/nodelist-tmp.$LSB_JOBID
+for i in `cat $CURDIR/nodelist-tmp.$LSB_JOBID`
+do
+       	CORES=`cat $CURDIR/nodelist.$LSB_JOBID|grep $i|wc -l`
+      	echo "$i:$CORES" >> $CURDIR/nodelist-tmp2.$LSB_JOBID
+done
+mv $CURDIR/nodelist-tmp2.$LSB_JOBID $CURDIR/nodelist.$LSB_JOBID
+rm -rf $CURDIR/nodelist-tmp.$LSB_JOBID
+
+mpirun -genv I_MPI_FABRICS_LIST=tcp -machinefile $CURDIR/nodelist.$LSB_JOBID lammps-$LMP_HW-$LMP_VERSION -sf $ACC_TYPE -pk $ACC_TYPE $PK_CORES -in $LSB_JOBNAME.in -l $LSB_JOBNAME.log > $LSB_JOBNAME.sta 
+
+rm -rf $CURDIR/nodelist.$LSB_JOBID
