@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# 指定作业名，此脚本默认inp文件为$LSB_JOBNAME.inp
+#BSUB -J plate-CPS8
+
+# 指定计算核数
+#BSUB -n 24
+
+# 指定队列，通过命令bqueues获得队列名称
+#BSUB -q E5-2678v3
+
+# 用户自定义命令，添加在主程序末尾，例如指定用户子程序：ADD_ARGS="user=xxxx.f"
+ADD_ARGS=""
+
+#====================   Do NOT revise any lines if you do not know their meanings    =====================================================================
+#=========================================================================================================================================================
+#BSUB -o %J.out
+#BSUB -e %J.err
+export MPI_IC_ORDER=TCP
+abaqus job=$LSB_JOBNAME cpus=$LSB_DJOB_NUMPROC ask_delete=OFF mp_mode=mpi $ADD_ARGS int > $LSB_JOBNAME.log
