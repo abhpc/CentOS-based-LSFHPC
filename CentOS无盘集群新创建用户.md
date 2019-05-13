@@ -1,5 +1,7 @@
 以下例子为创建一个用户名为"james"的用户
 
+[TOC]
+
 #### 1. root用户执行以下命令，指定其home目录
 
     # useradd james -d /home/james
